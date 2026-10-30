@@ -7,13 +7,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
     
     <style>
-        /* =========================================
-           ЦВЕТОВАЯ ГАММА (МЕНЯЙ ЗДЕСЬ)
-           ========================================= */
         :root {
-            --bg-color: #f7f5f0;       /* Цвет фона (кремовый) */
-            --text-main: #2b2b2b;      /* Цвет текста (графит) */
-            --accent-color: #8b7d6b;   /* Цвет точек (песочный) */
+            --bg-color: #f7f5f0;
+            --text-main: #2b2b2b;
+            --accent-color: #8b7d6b;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -22,10 +19,11 @@
             background-color: var(--bg-color);
             color: var(--text-main);
             font-family: 'Montserrat', sans-serif;
-            overflow: hidden; /* Убираем стандартные полосы прокрутки */
+            overflow: hidden;
+            user-select: none; /* Запрещаем выделять текст/картинки при перетаскивании */
         }
 
-        /* Шапка (зафиксирована поверх игры) */
+        /* Шапка */
         header {
             position: fixed;
             top: 20px;
@@ -33,14 +31,14 @@
             width: 100%;
             text-align: center;
             z-index: 10;
-            pointer-events: none; /* Чтобы шапка не мешала кликать по точкам */
+            pointer-events: none; 
         }
         header h1 {
             font-family: 'Cormorant Garamond', serif;
             font-size: 2.5rem;
             text-transform: uppercase;
             letter-spacing: 0.2em;
-            text-shadow: 0 0 10px rgba(247, 245, 240, 0.8); /* Легкая тень, чтобы текст не терялся на фото */
+            text-shadow: 0 0 10px rgba(247, 245, 240, 0.8);
         }
         header p {
             font-size: 0.8rem;
@@ -50,34 +48,32 @@
             text-shadow: 0 0 5px rgba(247, 245, 240, 0.9);
         }
 
-        /* КОНТЕЙНЕР ДЛЯ ПАНОРАМЫ */
+        /* Контейнер для панорамы */
         .panorama-container {
             width: 100vw;
             height: 100vh;
-            overflow-x: auto; /* Включаем горизонтальную прокрутку */
-            overflow-y: hidden;
-            /* Скрываем полосу прокрутки для красоты (работает в Chrome/Safari) */
-            scrollbar-width: none; 
-            -ms-overflow-style: none;
+            overflow: hidden; /* Скрываем скроллы, будем двигать через JS */
+            cursor: grab; /* Курсор в виде ручки */
         }
-        .panorama-container::-webkit-scrollbar { display: none; }
+        .panorama-container:active { cursor: grabbing; }
 
-        /* САМА ПАНОРАМА (3 экрана в ширину) */
+        /* Сама панорама */
         .panorama-track {
-            width: 300vw; /* Ширина = 3 экрана */
+            width: 300vw;
             height: 100vh;
             position: relative;
-            /* Временный фон (замени ссылку в url на свою картинку) */
-            // background-image: url('https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?q=80&w=3000&auto=format&fit=crop');
-            background-size: cover;
-            background-position: left center;
+            /* Временный фон (градиент вместо картинки) */
+            background: linear-gradient(135deg, #e8e4dd 0%, #d6cec1 50%, #e8e4dd 100%);
+            /* Когда вставишь картинку, удали строку выше и раскомментируй строку ниже */
+            /* background-image: url('имя-картинки.jpg'); background-size: cover; */
+            transition: transform 0.1s linear; /* Плавность при движении */
         }
 
         /* Пульсирующие точки */
         .hotspot {
             position: absolute;
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             background-color: var(--accent-color);
             border-radius: 50%;
             cursor: pointer;
@@ -86,7 +82,6 @@
             transition: transform 0.3s;
             z-index: 5;
         }
-
         .hotspot:hover { transform: scale(1.2); }
 
         @keyframes pulse {
@@ -95,7 +90,7 @@
             100% { box-shadow: 0 0 0 0 rgba(139, 125, 107, 0); }
         }
 
-        /* Модальное окно (всплывающее) */
+        /* Модальное окно */
         .modal {
             display: none;
             position: fixed;
@@ -107,34 +102,28 @@
             justify-content: center;
             padding: 20px;
         }
-
         .modal.active { display: flex; animation: fadeIn 0.4s ease; }
 
         .modal-content {
             background: #fff;
-            max-width: 800px;
+            max-width: 600px;
             width: 100%;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
         }
-
         .modal-img {
             width: 100%;
-            height: 400px;
+            height: 300px;
             background-color: #ddd;
-            object-fit: cover;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #888;
         }
-
-        .modal-text { padding: 30px; text-align: center; }
+        .modal-text { padding: 30px; }
         .modal-text h2 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; margin-bottom: 10px; }
         .modal-text p { color: #666; font-size: 0.9rem; margin-bottom: 20px; }
-
         .modal-btn {
             display: inline-block;
             text-decoration: none;
@@ -144,48 +133,29 @@
             font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            transition: background 0.3s;
         }
-        .modal-btn:hover { background: #000; }
-
         .close-btn {
             position: absolute;
-            top: 15px;
-            right: 20px;
-            font-size: 2rem;
-            cursor: pointer;
-            color: #333;
-            z-index: 10;
+            top: 10px; right: 15px;
+            font-size: 2rem; cursor: pointer; color: #333;
         }
-
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        @media (max-width: 768px) {
-            .modal-content { flex-direction: column; }
-            .modal-img { height: 250px; }
-            header h1 { font-size: 1.8rem; }
-        }
     </style>
 </head>
 <body>
 
     <header>
         <h1>Katroz</h1>
-        <p>Листайте вправо и влево. Находите скрытое.</p>
+        <p>Зажмите и потяните, чтобы исследовать</p>
     </header>
 
-    <!-- Панорамное поле -->
-    <div class="panorama-container">
-        <div class="panorama-track">
+    <!-- Панорама -->
+    <div class="panorama-container" id="panorama-container">
+        <div class="panorama-track" id="panorama-track">
             
-            <!-- Точки. Координаты в процентах (left) от 0% до 100% -->
-            <!-- Точка на первом экране -->
+            <!-- Точки (Координаты: top - сверху, left - слева) -->
             <div class="hotspot" style="top: 50%; left: 20%;" onclick="openModal(1)"></div>
-            
-            <!-- Точка на втором экране (примерно центр) -->
             <div class="hotspot" style="top: 60%; left: 50%;" onclick="openModal(2)"></div>
-
-            <!-- Точка на третьем экране -->
             <div class="hotspot" style="top: 40%; left: 85%;" onclick="openModal(1)"></div>
 
         </div>
@@ -198,24 +168,42 @@
             <div class="modal-img" id="modal-image">Фото предмета</div>
             <div class="modal-text">
                 <h2 id="modal-title">Название</h2>
-                <p id="modal-desc">Описание предмета.</p>
-                <a href="https://t.me/ВАШ_НИК" class="modal-btn" target="_blank">Запросить детали</a>
+                <p id="modal-desc">Описание.</p>
+                <a href="https://t.me/ВАШ_НИК" class="modal-btn" target="_blank">Запросить</a>
             </div>
         </div>
     </div>
 
     <script>
+        // --- СКРИПТ ПЕРЕТАСКИВАНИЯ ---
+        const container = document.getElementById('panorama-container');
+        const track = document.getElementById('panorama-track');
+        
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        container.addEventListener('mousedown', (e) => {
+            isDown = true;
+            startX = e.pageX - container.offsetLeft;
+            scrollLeft = container.scrollLeft;
+        });
+
+        container.addEventListener('mouseleave', () => { isDown = false; });
+        container.addEventListener('mouseup', () => { isDown = false; });
+
+        container.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - container.offsetLeft;
+            const walk = (x - startX) * 1.5; // Скорость прокрутки
+            container.scrollLeft = scrollLeft - walk;
+        });
+
+        // --- СКРИПТ ОКОН ---
         const items = {
-            1: {
-                title: "Сумка «Тепло»",
-                desc: "Натуральная кожа. Идеально ложится в руку.",
-                img: "Фото сумки"
-            },
-            2: {
-                title: "Серьги «Камень»",
-                desc: "Гладкий камень, ручная сборка.",
-                img: "Фото серег"
-            }
+            1: { title: "Сумка «Тепло»", desc: "Натуральная кожа.", img: "Фото сумки" },
+            2: { title: "Серьги «Камень»", desc: "Гладкий камень.", img: "Фото серег" }
         };
 
         function openModal(id) {
