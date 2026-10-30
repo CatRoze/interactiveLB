@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katroz | Найди свое</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #f7f5f0;
+            --text-main: #2b2b2b;
+            --accent: #8b7d6b; /* Песочный акцент для точек */
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Montserrat', sans-serif;
+            overflow: hidden; /* Запрещаем скролл, чтобы это была как игра */
+        }
+
+        /* Шапка */
+        header {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            z-index: 10;
+            pointer-events: none;
+        }
+        header h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+        }
+        header p {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 10px;
+            letter-spacing: 0.1em;
+        }
+
+        /* Контейнер для игры (фон) */
+        .game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            /* Сюда мы потом вставим картинку-фон */
+            background-color: #e8e4dd; 
+            background-image: url('https://images.unsplash.com/photo-1618220179428-22790b461013?q=80&w=2000&auto=format&fit=crop'); /* Временный фон */
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Пульсирующие точки */
+        .hotspot {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: var(--accent);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 0 0 rgba(139, 125, 107, 0.7);
+            animation: pulse 2s infinite;
+            transition: transform 0.3s;
+            z-index: 5;
+        }
+
+        .hotspot:hover {
+            transform: scale(1.2);
+        }
+
+        /* Анимация пульсации */
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(139, 125, 107, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(139, 125, 107, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(139, 125, 107, 0); }
+        }
+
+        /* Модальное окно (всплывающее) */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(247, 245, 240, 0.95);
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .modal-content {
+            background: #fff;
+            max-width: 800px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        .modal-img {
+            width: 100%;
+            height: 500px;
+            background-color: #ddd;
+            object-fit: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+        }
+
+        .modal-text {
+            padding: 30px;
+            text-align: center;
+        }
+
+        .modal-text h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .modal-text p {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .modal-btn {
+            display: inline-block;
+            text-decoration: none;
+            color: #fff;
+            background: var(--text-main);
+            padding: 12px 30px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: background 0.3s;
+        }
+        .modal-btn:hover { background: #000; }
+
+        /* Кнопка закрытия */
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #333;
+            z-index: 10;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Адаптивность для телефонов */
+        @media (max-width: 768px) {
+            .modal-content { flex-direction: column; }
+            .modal-img { height: 300px; }
+            header h1 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Katroz</h1>
+        <p>Коснитесь огней, чтобы увидеть скрытое</p>
+    </header>
+
+    <!-- Игровое поле -->
+    <div class="game-container">
+        <!-- Точка 1 (координаты задаются в процентах top и left) -->
+        <div class="hotspot" style="top: 60%; left: 30%;" onclick="openModal(1)"></div>
+        
+        <!-- Точка 2 -->
+        <div class="hotspot" style="top: 40%; left: 70%;" onclick="openModal(2)"></div>
+    </div>
+
+    <!-- Всплывающее окно (Модальное) -->
+    <div class="modal" id="myModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            
+            <!-- Здесь будет фото предмета -->
+            <div class="modal-img" id="modal-image">Фото предмета</div>
+            
+            <div class="modal-text">
+                <h2 id="modal-title">Название</h2>
+                <p id="modal-desc">Описание предмета.</p>
+                <!-- Ссылка на твой телеграм для заказа -->
+                <a href="https://t.me/ВАШ_НИК" class="modal-btn" target="_blank">Запросить детали</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Данные о предметах (потом заменишь на свои)
+        const items = {
+            1: {
+                title: "Сумка «Тепло»",
+                desc: "Натуральная кожа. Идеально ложится в руку.",
+                img: "Фото сумки" // Сюда потом вставим <img src="...">
+            },
+            2: {
+                title: "Серьги «Камень»",
+                desc: "Гладкий камень, ручная сборка.",
+                img: "Фото серег"
+            }
+        };
+
+        function openModal(id) {
+            const item = items[id];
+            document.getElementById('modal-title').innerText = item.title;
+            document.getElementById('modal-desc').innerText = item.desc;
+            
+            // Если есть картинка, мы ее выведем (пока это просто текст)
+            document.getElementById('modal-image').innerHTML = item.img;
+            
+            document.getElementById('myModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('myModal').classList.remove('active');
+        }
+
+        // Закрытие по клику вне окна
+        window.onclick = function(event) {
+            const modal = document.getElementById('myModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
