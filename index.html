@@ -71,9 +71,10 @@
         /* Пульсирующие точки */
         .hotspot {
             position: absolute;
-            width: 24px;
-            height: 24px;
-            background-color: var(--accent-color);
+            width: 16px; /* Сделаем поменьше */
+            height: 16px;
+            background-color: rgba(255, 255, 255, 0.8); /* Белый полупрозрачный */
+            border: 2px solid #8b7d6b; /* Песочная окантовка */
             border-radius: 50%;
             cursor: pointer;
             box-shadow: 0 0 0 0 rgba(139, 125, 107, 0.7);
@@ -153,9 +154,9 @@
         <div class="panorama-track" id="panorama-track">
             
             <!-- Точки (Координаты: top - сверху, left - слева) -->
-            <div class="hotspot" style="top: 50%; left: 20%;" onclick="openModal(1)"></div>
-            <div class="hotspot" style="top: 60%; left: 50%;" onclick="openModal(2)"></div>
-            <div class="hotspot" style="top: 40%; left: 85%;" onclick="openModal(1)"></div>
+            <div class="hotspot" style="top: 55%; left: 25%;" onclick="openModal(1)"></div>
+            <div class="hotspot" style="top: 45%; left: 50%;" onclick="openModal(2)"></div>
+            <div class="hotspot" style="top: 55%; left: 75%;" onclick="openModal(1)"></div>
 
         </div>
     </div>
