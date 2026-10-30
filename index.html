@@ -7,6 +7,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
     
     <style>
+        /* =========================================
+           ЦВЕТОВАЯ ГАММА
+           ========================================= */
         :root {
             --bg-color: #f7f5f0;
             --text-main: #2b2b2b;
@@ -20,7 +23,7 @@
             color: var(--text-main);
             font-family: 'Montserrat', sans-serif;
             overflow: hidden;
-            user-select: none; /* Запрещаем выделять текст/картинки при перетаскивании */
+            user-select: none; 
         }
 
         /* Шапка */
@@ -52,45 +55,43 @@
         .panorama-container {
             width: 100vw;
             height: 100vh;
-            overflow: hidden; /* Скрываем скроллы, будем двигать через JS */
-            cursor: grab; /* Курсор в виде ручки */
+            overflow: hidden; 
+            cursor: grab; 
         }
         .panorama-container:active { cursor: grabbing; }
 
-           /* Сама панорама */
+        /* Сама панорама */
         .panorama-track {
             width: 300vw;
             height: 100vh;
             position: relative;
-            background-image: url('bg.png');
+            background-image: url('bg.png'); /* Твоя картинка */
             background-size: cover;
             background-position: center;
-            transition: transform 0.1s linear; /* Плавность при движении */
+            transition: transform 0.1s linear;
         }
 
-        /* Пульсирующие точки */
-        .hotspot {
+        /* НЕВИДИМЫЕ ЗОНЫ КЛИКА (Рамки) */
+        /* Ты будешь двигать их так же, как раньше двигала точки */
+        .click-zone {
             position: absolute;
-            width: 16px; /* Сделаем поменьше */
-            height: 16px;
-            background-color: rgba(255, 255, 255, 0.8); /* Белый полупрозрачный */
-            border: 2px solid #8b7d6b; /* Песочная окантовка */
-            border-radius: 50%;
+            /* Размеры по умолчанию (можно менять для каждой рамки отдельно) */
+            width: 8vw; 
+            height: 25vh;
+            background-color: rgba(255, 255, 255, 0); /* Абсолютно прозрачные */
             cursor: pointer;
-            box-shadow: 0 0 0 0 rgba(139, 125, 107, 0.7);
-            animation: pulse 2s infinite;
-            transition: transform 0.3s;
-            z-index: 5;
-        }
-        .hotspot:hover { transform: scale(1.2); }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(139, 125, 107, 0.7); }
-            70% { box-shadow: 0 0 0 15px rgba(139, 125, 107, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(139, 125, 107, 0); }
+            transition: all 0.3s;
+            border: 2px solid transparent;
         }
 
-        /* Модальное окно */
+        /* Эффект при наведении (опционально): легкая белая подсветка */
+        .click-zone:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 15px rgba(255,255,255,0.3);
+        }
+
+        /* Модальное окно (всплывающее) */
         .modal {
             display: none;
             position: fixed;
@@ -114,7 +115,7 @@
         }
         .modal-img {
             width: 100%;
-            height: 300px;
+            height: 400px;
             background-color: #ddd;
             display: flex;
             align-items: center;
@@ -153,10 +154,17 @@
     <div class="panorama-container" id="panorama-container">
         <div class="panorama-track" id="panorama-track">
             
-            <!-- Точки (Координаты: top - сверху, left - слева) -->
-            <div class="hotspot" style="top: 55%; left: 25%;" onclick="openModal(1)"></div>
-            <div class="hotspot" style="top: 45%; left: 50%;" onclick="openModal(2)"></div>
-            <div class="hotspot" style="top: 55%; left: 75%;" onclick="openModal(1)"></div>
+            <!-- СЮДА МЫ БУДЕМ ДОБАВЛЯТЬ ЗОНЫ КЛИКА -->
+            <!-- Пример 1: Первая рамка (координаты, ширина и высота) -->
+            <!-- style="top: 50%; left: 10%; width: 10vw; height: 30vh;" -->
+            
+            <div class="click-zone" style="top: 40%; left: 15%; width: 9vw; height: 35vh;" onclick="openModal(1)"></div>
+            
+            <!-- Пример 2: Вторая рамка -->
+            <div class="click-zone" style="top: 45%; left: 30%; width: 6vw; height: 25vh;" onclick="openModal(2)"></div>
+
+            <!-- Пример 3: Третья рамка -->
+            <div class="click-zone" style="top: 35%; left: 50%; width: 12vw; height: 45vh;" onclick="openModal(1)"></div>
 
         </div>
     </div>
@@ -177,9 +185,6 @@
     <script>
         // --- СКРИПТ ПЕРЕТАСКИВАНИЯ ---
         const container = document.getElementById('panorama-container');
-        const track = document.getElementById('panorama-track');
-        // Автоматический старт с центра
-        container.scrollLeft = container.scrollWidth / 3;
         
         let isDown = false;
         let startX;
@@ -198,14 +203,25 @@
             if (!isDown) return;
             e.preventDefault();
             const x = e.pageX - container.offsetLeft;
-            const walk = (x - startX) * 1.5; // Скорость прокрутки
+            const walk = (x - startX) * 1.5;
             container.scrollLeft = scrollLeft - walk;
         });
 
+        // Автоматический старт с центра
+        container.scrollLeft = container.scrollWidth / 3;
+
         // --- СКРИПТ ОКОН ---
         const items = {
-            1: { title: "Сумка «Тепло»", desc: "Натуральная кожа.", img: "Фото сумки" },
-            2: { title: "Серьги «Камень»", desc: "Гладкий камень.", img: "Фото серег" }
+            1: { 
+                title: "Сумка «Тепло»", 
+                desc: "Натуральная кожа. Идеально ложится в руку.", 
+                img: "<img src='item1.jpg' style='width:100%; height:100%; object-fit:cover;'>" 
+            },
+            2: { 
+                title: "Серьги «Камень»", 
+                desc: "Гладкий камень, ручная сборка.", 
+                img: "<img src='item2.jpg' style='width:100%; height:100%; object-fit:cover;'>" 
+            }
         };
 
         function openModal(id) {
