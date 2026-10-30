@@ -57,15 +57,14 @@
         }
         .panorama-container:active { cursor: grabbing; }
 
-        /* Сама панорама */
+           /* Сама панорама */
         .panorama-track {
             width: 300vw;
             height: 100vh;
             position: relative;
-            /* Временный фон (градиент вместо картинки) */
-            background: linear-gradient(135deg, #e8e4dd 0%, #d6cec1 50%, #e8e4dd 100%);
-            /* Когда вставишь картинку, удали строку выше и раскомментируй строку ниже */
-            /* background-image: url('имя-картинки.jpg'); background-size: cover; */
+            background-image: url('bg.png');
+            background-size: cover;
+            background-position: center;
             transition: transform 0.1s linear; /* Плавность при движении */
         }
 
