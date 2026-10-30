@@ -178,6 +178,8 @@
         // --- СКРИПТ ПЕРЕТАСКИВАНИЯ ---
         const container = document.getElementById('panorama-container');
         const track = document.getElementById('panorama-track');
+        // Автоматический старт с центра
+        container.scrollLeft = container.scrollWidth / 3;
         
         let isDown = false;
         let startX;
